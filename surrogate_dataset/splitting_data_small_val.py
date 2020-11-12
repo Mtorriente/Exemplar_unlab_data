@@ -25,15 +25,15 @@ for class_i in tqdm(classes):
     except:
         print ('Class folder already existing... ???')
 
-    images = os.listdir('./data_ampliados/' + class_i)
+    images = os.listdir('./datos_ampliados/' + class_i)
     images.sort()
 
     for image in images:
         if np.random.uniform(0,1) >= train_size:
-            copyfile('./data_ampliados/' + str(class_i).zfill(len(str(len(classes)))) + '/' + image,
+            copyfile('./datos_ampliados/' + str(class_i).zfill(len(str(len(classes)))) + '/' + image,
                      './val_set/' + str(class_i).zfill(3) + '/' + image)
         else:
-            copyfile('./data_ampliados/' + str(class_i).zfill(len(str(len(classes)))) + '/' + image,
+            copyfile('./datos_ampliados/' + str(class_i).zfill(len(str(len(classes)))) + '/' + image,
                      './train_set/' + str(class_i).zfill(len(str(len(classes)))) + '/' + image)
         # change the previous else for an elif in
         # the case that you want a test split as well...
