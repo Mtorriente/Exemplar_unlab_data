@@ -9,9 +9,9 @@ from tqdm import tqdm
 #out_path = './class_folder_edge/'
 #in_path = '../../surrogate_dataset_imagenet/classes_folder/'
 
-out_path = './surrogate_dataset/class_folder_edge/'
+out_path = './surrogate_dataset/imagenes_contorno/'
 #in_path = '../classes_folder_16000_imagenet/'
-in_path = './surrogate_dataset/classes_folder/'
+in_path = './surrogate_dataset/imagenes_entrada/'
 
 classes = os.listdir(in_path)
 classes.sort()
