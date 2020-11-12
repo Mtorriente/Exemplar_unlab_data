@@ -26,11 +26,11 @@ np.random.seed(42)
 root_path = './surrogate_dataset/'
 classes_path = join(root_path, 'classes_folder')
 mask_path = join(root_path, 'class_folder_edge') # mask_folder
-nb_classes = 100   # this will be the number of classes
+nb_classes = 10   #1600 this will be the number of classes
 
 #nb_samples = 125   # This correspond to the number of transformations
 # I reduced to 112 to reduce the generation and training time... The split will be 90/10
-nb_samples = 112
+nb_samples = 15 #112
 
 
 # importing transformations
