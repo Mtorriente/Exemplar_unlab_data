@@ -68,7 +68,7 @@ st = time.time()
 
 # Here start a for loop to go through all the classes
 for label_ind in tqdm(labels):
-    directory = join(root_path, 'data', str(label_ind).split('.')[0].zfill(len(str(nb_classes))))
+    directory = join(root_path, 'datos_ampliados', str(label_ind).split('.')[0].zfill(len(str(nb_classes))))
     if not os.path.exists(directory):
         os.makedirs(directory)
     
