@@ -76,6 +76,7 @@ class Net(nn.Module):
         self.pool1 = nn.MaxPool2d(3,2)
         self.drop1 = nn.Dropout2d(0.25)
         self.conv2 = nn.Conv2d(92,256,5,1,2)
+        self.relu = nn.ReLU()
         self.pool2 = nn.MaxPool2d(3,2)
         self.drop2 = nn.Dropout2d(0.25)
         self.conv3 = nn.Conv2d(256,512,5,padding=2)
@@ -87,15 +88,15 @@ class Net(nn.Module):
         self.sfmx = nn.Softmax(1)
 
     def forward(self, x):
-        out = self.pool1(self.conv1(x))
+        out = self.pool1(self.relu(self.conv1(x)))
         out = self.drop1(out)
-        out = self.pool2(self.conv2(out))
+        out = self.pool2(self.relu(self.conv2(out)))
         out = self.drop2(out)
-        out = self.drop3(self.conv3(out))
+        out = self.drop3(self.relu(self.conv3(out)))
         out = self.flat(out)
-        out = F.relu(self.fc1(out))
+        out = self.relu(self.fc1(out))
         out = self.dropDense1(out)
-        out = F.relu(self.fc2(out))
+        out = self.relu(self.fc2(out))
         out = self.sfmx(out)
         return out
         
