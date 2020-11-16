@@ -24,7 +24,7 @@ np.random.seed(42)
 
 # General variables
 root_path = './surrogate_dataset/'
-classes_path = join(root_path, 'imagenes_entrada')
+classes_path = join(root_path, 'clases')
 mask_path = join(root_path, 'imagenes_contorno') # mask_folder
 nb_classes = 10   #1600 this will be the number of classes
 
