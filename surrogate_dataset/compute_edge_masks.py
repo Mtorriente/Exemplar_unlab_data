@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 out_path = './surrogate_dataset/imagenes_contorno/'
 #in_path = '../classes_folder_16000_imagenet/'
-in_path = './surrogate_dataset/imagenes_entrada/'
+in_path = './surrogate_dataset/clases/'
 
 classes = os.listdir(in_path)
 classes.sort()
