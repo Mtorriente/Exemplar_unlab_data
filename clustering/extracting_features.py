@@ -45,7 +45,7 @@ test_number = 'maxpool_allConv'
 
 # setting paths
 # 1st iteration path
-images_path = '../surrogate_dataset/train_set/0000/'
+images_path = '../surrogate_dataset/datos_ampliados/0000/'
 
 
 # 2nd iteration path
