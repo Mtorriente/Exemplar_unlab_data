@@ -5,7 +5,6 @@ import torchvision.datasets as datasets
 
 from matplotlib import pyplot as plt
 
-
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
@@ -48,7 +47,7 @@ Added now:
 '''
 
 # preparing datasets for training and validation
-batch_size = 128
+batch_size = 128  
 mean = [0.383661700858527, 0.3819784115384924, 0.3588786631614881]
 std=[0.2167717755518767, 0.21201058526724945, 0.21143164036556178]
 normalize = transforms.Normalize(mean = mean, std=std)
@@ -64,11 +63,12 @@ print ("Training with " + str(nb_classes) + " classes")
 #net = Net(nb_classes).cuda()
 print ("Model defined")
 print ("Model to GPU")
-#Añadida esta NET por mí, porque hacia referencia a una lib networks que no encuentro
+
+#Añado esta NET por mí, porque hacia referencia a una lib networks que no encuentro
 def flatten(x):
     """Flattens a tensor."""
     return x.view(x.size(0), -1)
-
+    
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -101,7 +101,6 @@ class Net(nn.Module):
         return out
         
 net = Net()
-print(net)
 initial_lr = 0.01
 
 criterion = nn.CrossEntropyLoss()
@@ -121,12 +120,9 @@ print ('')
 print ("Optimizer (initial): ")
 print ("\tDampening: ",optimizer.param_groups[0]['dampening'])
 print ("\tNesterov: ",optimizer.param_groups[0]['nesterov'])
-#print "\tparams: ",
-#print optimizer.param_groups[0]['params']
 print ("\tLR: ",optimizer.param_groups[0]['lr'])
 print ("\tWeight_decay: ",optimizer.param_groups[0]['weight_decay'])
 print ("\tMomentum: ",optimizer.param_groups[0]['momentum'])
-#{'dampening': 0, 'nesterov': False, 'params': 1, , 'lr': 0.01, 'weight_decay': 0, 'momentum': 0.9}
 print ('')
 ################################################################
 
@@ -165,38 +161,6 @@ print ('')
 ################################################################
 st = time.time()
 
-################## RESUMING TRAINING #####################3
-if resume:
-    model_path = '../saving_model/exp' + str(experiment) + '/exp' + str(experiment) + '_epoch_' + str(initial_epoch) + '.pth.tar'
-    checkpoint = torch.load(model_path)
-    net.load_state_dict(checkpoint['state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer'])
-
-    #################### Printing optimizer configuration ########################
-    print ('')
-    print ("Optimizer (After loading model): ")
-    print ("\tDampening: ")
-    print ([str(i['dampening']) for i in optimizer.param_groups])
-    print ("\tNesterov: ")
-    print ([str(i['nesterov']) for i in optimizer.param_groups])
-    #print "\tparams: ",
-    #print optimizer.param_groups[0]['params']
-    print ("\tLR: ")
-    print ([str(i['lr']) for i in optimizer.param_groups])
-    print ("\tWeight_decay: ")
-    print ([str(i['weight_decay']) for i in optimizer.param_groups])
-    print ("\tMomentum: ")
-    print ([str(i['momentum']) for i in optimizer.param_groups])
-    #{'dampening': 0, 'nesterov': False, 'params': 1, , 'lr': 0.01, 'weight_decay': 0, 'momentum': 0.9}
-    print ('')
-    ################################################################
-    print ('Resuming training in epoch ' + str(initial_epoch))
-    accuracy_train_history = checkpoint['history_train_acc']
-    loss_history = checkpoint['history_train_loss']
-    val_loss_history = checkpoint['history_val_loss']
-    accuracy_val_history = checkpoint['history_val_acc']
-
-
 for epoch in range(initial_epoch, nb_epochs):
     print ('Training epoch ' + str(epoch + 1).zfill(3))
     st = time.time()
@@ -217,11 +181,6 @@ for epoch in range(initial_epoch, nb_epochs):
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
-
-        # print statistics
-        # loss
-        #running_loss += loss.data[0]
-        #loss_history.append(loss.data[0])
         running_loss += loss.data
         loss_history.append(loss.data)
 
@@ -286,7 +245,7 @@ for epoch in range(initial_epoch, nb_epochs):
 
     nd = time.time()
     print('Validation loss: %.3f' % (running_val_loss / (len(val_set)/batch_size)))   # we divide the loss by
-                                                                                                    # the number of itereations
+                                                                                                    # the number of iterations
                                                                                                     # needed to see all the validation set
     print('Validation accuracy: %.3f %%' % (100 * correct / float(total)))
     print('Validation time: ' + str(nd-st))
