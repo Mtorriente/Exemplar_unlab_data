@@ -9,7 +9,7 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.decomposition import PCA
 
 import time
-
+import os
 from utils_clust import normalizing_samples_L2, loading_images, searching_similar_images
 
 # To save pairs of children...
@@ -25,16 +25,9 @@ image_names_path = './less_collisions/features_maxpool_allConv.txt'
 # source images
 # 1st iteration path
 images_path = '../surrogate_dataset/datos_ampliados/0000/'
-
-# 2nd iteration path
-#images_path = './images_2nd_iteration/'
-
-# 3rd iteration path
-#images_path = './images_3rd_iteration/'
-
-# 4th iteration path
-#images_path = './images_4th_iteration/'
-
+labels = os.listdir(images_path)
+labels.sort()
+nb_classes = len(labels)  #16000 
 # load images
 samples = loading_images(features_path)
 # normalize images
@@ -66,8 +59,6 @@ clustering.fit(samples_L2_pca_L2)
 print("Clustering time with %s and %d samples: %.2fs" % (linkage, len(samples_L2_pca_L2), time.time() - t0))
 
 children = clustering.children_
-#distances = clustering.distances
-#distances = clustering.distance_threshold
 distances = clustering.distances_
 # The leaves correspond to the samples introduced
 leaves = clustering.n_leaves_
@@ -208,15 +199,147 @@ for child in sub_child_mixed:
         
     if len(plot_leaf) == 7:
         num_7 += 1
-    images_path = '../surrogate_dataset/datos_ampliados/0000/'
+
     for img in plot_leaf:
-        image = Image.open(images_path + str(img).zfill(2) + '.png')
+        image = Image.open(images_path + str(img).zfill(len(str(nb_classes))) + '.png')
         plt.subplot(1,nb_img, num)
         plt.imshow(np.asarray(image))
         num += 1
     print(plot_leaf)
     larger_clusters.append(plot_leaf)
     print(larger_clusters)
+plt.show()
+
+larger_clusters_2 = []
+num_3 = 0
+num_4 = 0
+num_5 = 0
+num_6 = 0
+num_7 = 0
+
+for child in sub_child_int:
+    plot_leaf = []
+    plt.figure()
+
+    new_idx = min(child)-leaves
+    if (children[new_idx]<leaves).all():
+        plot_leaf.append(children[new_idx][0])
+        plot_leaf.append(children[new_idx][1])
+        
+    elif(children[new_idx]<leaves).any():
+        plot_leaf.append(min(children[new_idx]))
+        new_idx = max(children[new_idx])-leaves
+        
+        if (children[new_idx]<leaves).all():
+            plot_leaf.append(children[new_idx][0])
+            plot_leaf.append(children[new_idx][1])
+            
+        elif(children[new_idx]<leaves).any():
+            plot_leaf.append(min(children[new_idx]))
+            #print("####### Another internal node ######")
+            
+            new_idx = max(children[new_idx])-leaves
+
+            if (children[new_idx]<leaves).all():
+                plot_leaf.append(children[new_idx][0])
+                plot_leaf.append(children[new_idx][1])
+
+            elif(children[new_idx]<leaves).any():
+                plot_leaf.append(min(children[new_idx]))
+                #print("####### Another internal node ######")
+                
+                new_idx = max(children[new_idx])-leaves
+
+                if (children[new_idx]<leaves).all():
+                    plot_leaf.append(children[new_idx][0])
+                    plot_leaf.append(children[new_idx][1])
+                    
+                elif(children[new_idx]<leaves).any():
+                    plot_leaf.append(min(children[new_idx]))
+                    #print("####### Another internal node ######")
+                    
+                    new_idx = max(children[new_idx])-leaves
+
+                    if (children[new_idx]<leaves).all():
+                        plot_leaf.append(children[new_idx][0])
+                        plot_leaf.append(children[new_idx][1])
+
+                    elif(children[new_idx]<leaves).any():
+                        plot_leaf.append(min(children[new_idx]))
+                        print("####### Another internal node ######")
+ 
+    new_idx = max(child)-leaves
+    if (children[new_idx]<leaves).all():
+        plot_leaf.append(children[new_idx][0])
+        plot_leaf.append(children[new_idx][1])
+        
+    elif(children[new_idx]<leaves).any():
+        plot_leaf.append(min(children[new_idx]))
+        new_idx = max(children[new_idx])-leaves
+        
+        if (children[new_idx]<leaves).all():
+            plot_leaf.append(children[new_idx][0])
+            plot_leaf.append(children[new_idx][1])
+            
+        elif(children[new_idx]<leaves).any():
+            plot_leaf.append(min(children[new_idx]))
+            #print("####### Another internal node ######")
+            
+            new_idx = max(children[new_idx])-leaves
+
+            if (children[new_idx]<leaves).all():
+                plot_leaf.append(children[new_idx][0])
+                plot_leaf.append(children[new_idx][1])
+
+            elif(children[new_idx]<leaves).any():
+                plot_leaf.append(min(children[new_idx]))
+                #print("####### Another internal node ######")
+                
+                new_idx = max(children[new_idx])-leaves
+
+                if (children[new_idx]<leaves).all():
+                    plot_leaf.append(children[new_idx][0])
+                    plot_leaf.append(children[new_idx][1])
+                    
+                elif(children[new_idx]<leaves).any():
+                    plot_leaf.append(min(children[new_idx]))
+                    #print("####### Another internal node ######")
+                    
+                    new_idx = max(children[new_idx])-leaves
+
+                    if (children[new_idx]<leaves).all():
+                        plot_leaf.append(children[new_idx][0])
+                        plot_leaf.append(children[new_idx][1])
+
+                    elif(children[new_idx]<leaves).any():
+                        plot_leaf.append(min(children[new_idx]))
+                        print("####### Another internal node ######")
+    
+    nb_img = len(plot_leaf)
+    num = 1
+    
+    if nb_img == 3:
+        num_3 += 1
+    
+    if nb_img == 4:
+        num_4 += 1
+    
+    if nb_img == 5:
+        num_5 += 1
+
+    if nb_img == 6:
+        num_6 += 1
+        
+    if nb_img == 7:
+        num_7 += 1
+
+    for img in plot_leaf:
+        image = Image.open(images_path + str(img).zfill(6) + '.png')
+        plt.subplot(1,nb_img, num)
+        plt.imshow(np.asarray(image))
+        num += 1
+    print(plot_leaf)
+    larger_clusters_2.append(plot_leaf)
 plt.show()
 
 num_3, num_4, num_5, num_6, num_7
@@ -239,4 +362,4 @@ np.save(path_pairs_out + '.npy', child_array)
 ### REMEMBER TO BUILD TEH CLUSTERS AGAIN WITH ALL THE CHILDRE!!!! ALL OF THEM!!!
 if len(sub_child_mixed) > 0:
     #sub_child_mixed_array = np.vstack(sub_child_mixed)
-    np.save(path_pairs_out_larger_clusters + '.npy', larger_clusters)
+    np.save(path_pairs_out_larger_clusters + '.npy', larger_clusters+larger_clusters_2)
