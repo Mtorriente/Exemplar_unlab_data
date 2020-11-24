@@ -6,5 +6,3 @@ with ZipFile(fichero,'r') as zip:
   zip.extractall()
   print("Done extracting file")
 
-!pip install scikit-cuda
-!pip install chainercv
