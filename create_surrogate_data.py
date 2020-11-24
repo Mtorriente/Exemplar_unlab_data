@@ -20,18 +20,22 @@ import sys
 
 from tqdm import tqdm
 
-np.random.seed(42)
+np.random.seed(42) #se repiten los numeros aleatorios cada 42 numeros
 
 # General variables
 root_path = './surrogate_dataset/'
 classes_path = join(root_path, 'clases')
 mask_path = join(root_path, 'imagenes_contorno') # mask_folder
-nb_classes = 10   #1600 this will be the number of classes
+
+labels = os.listdir(classes_path)
+labels.sort()
+print ('%d classes loaded...' %len(labels))
+nb_classes = len(labels)  #16000 
+st = time.time()
 
 #nb_samples = 125   # This correspond to the number of transformations
 # I reduced to 112 to reduce the generation and training time... The split will be 90/10
 nb_samples = 15 #112
-
 
 # importing transformations
 sys.path.append('./')
@@ -61,11 +65,6 @@ rot_and_flip = Rotate_and_flip(max_rot)
 hsv_contrast = HSV_contrast_2(hsv_power, hsv_factor, hsv_addition)
 hsv_color = HSV_color(hsv_add_color)
 
-labels = os.listdir(classes_path)
-labels.sort()
-print ('%d classes loaded...' %len(labels))
-st = time.time()
-
 # Here start a for loop to go through all the classes
 for label_ind in tqdm(labels):
     directory = join(root_path, 'datos_ampliados', str(label_ind).split('.')[0].zfill(len(str(nb_classes))))
@@ -83,11 +82,7 @@ for label_ind in tqdm(labels):
     for transf_idx in range(nb_samples):
         (image_reesc, coord_resc) = scaling(image, anchor)
         croped_im = a_crop(image_reesc, coord_resc, translation)
-        transf = transforms.Compose([pca_rand,
-                                     rot_and_flip,
-                                     hsv_contrast,
-                                     hsv_color
-                                     ])
+        transf = transforms.Compose([pca_rand,rot_and_flip,hsv_contrast,hsv_color])
 
         image_transf = transf(croped_im)
         image_path = join(directory, str(transf_idx).zfill(len(str(nb_samples))))
