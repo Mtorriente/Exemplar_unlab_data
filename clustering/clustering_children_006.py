@@ -206,7 +206,6 @@ cluster_size = 8
 for num, sample_i in enumerate(query_names):
     cluster_i = []
     cluster_i.append(sample_i)
-    print(sample_i)
     instance_num = 1
     while len(cluster_i)<cluster_size and instance_num<15:
         image_nb = ranks[num][instance_num]
@@ -236,16 +235,12 @@ print ("Set length after processing the short clusters: ",len(samples_set_s))
 print ("Set length of the full set after processing the large clusters: ",len(samples_full_set))
 
 # after that i should do the same with the other clusters with 2 images each...
-print (sim.shape)
-print (sim[:5])
-print (sim[-5:])
-print ('')
-print (np.amax(sim))
-print (np.amin(sim))
-sim_ord = np.argsort(sim)
-print ('')
-print (sim_ord[:5])
-print (sim_ord[-5:])
+print ('Similarity shape:',sim.shape)
+
+#print (np.amax(sim))
+#print (np.amin(sim))
+#sim_ord = np.argsort(sim)
+
 
 ...
 # finally we move all the single classes to a folder inside the "dataset00?" folder
