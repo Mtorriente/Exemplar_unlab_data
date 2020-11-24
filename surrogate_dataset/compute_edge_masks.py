@@ -6,11 +6,7 @@ from skimage.filters import sobel
 from tqdm import tqdm
 
 # Converting the class images into "edge masks"
-#out_path = './class_folder_edge/'
-#in_path = '../../surrogate_dataset_imagenet/classes_folder/'
-
 out_path = './surrogate_dataset/imagenes_contorno/'
-#in_path = '../classes_folder_16000_imagenet/'
 in_path = './surrogate_dataset/clases/'
 
 classes = os.listdir(in_path)
