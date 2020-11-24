@@ -3,8 +3,7 @@ from shutil import copyfile
 import numpy as np
 from tqdm import tqdm
 np.random.seed(42)
-# create folder for train set
-# create folder for validation set
+# Split the data into train-set and val-set
 try:
     os.mkdir('train_set')
     os.mkdir('val_set')
@@ -31,7 +30,7 @@ for class_i in tqdm(classes):
     for image in images:
         if np.random.uniform(0,1) >= train_size:
             copyfile('./datos_ampliados/' + str(class_i).zfill(len(str(len(classes)))) + '/' + image,
-                     './val_set/' + str(class_i).zfill(3) + '/' + image)
+                     './val_set/' + str(class_i).zfill(len(str(len(classes)))) + '/' + image)
         else:
             copyfile('./datos_ampliados/' + str(class_i).zfill(len(str(len(classes)))) + '/' + image,
                      './train_set/' + str(class_i).zfill(len(str(len(classes)))) + '/' + image)
