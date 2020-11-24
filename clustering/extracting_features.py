@@ -47,17 +47,6 @@ test_number = 'maxpool_allConv'
 # 1st iteration path
 images_path = '../surrogate_dataset/datos_ampliados/0000/'
 
-
-# 2nd iteration path
-#images_path = './images_2nd_iteration/'
-
-# 3rd iteration path
-#images_path = './images_3rd_iteration/'
-
-# 4th iteration path
-#images_path = './images_4th_iteration/'
-
-
 output = './less_collisions/'
 image_names = output + 'features_' + test_number +'.txt'
 output_path = output + 'features_' + test_number +'.hdf5'
@@ -127,7 +116,6 @@ pooling_to_fixed_value = nn.AdaptiveMaxPool2d(feat_side)
 
 def process_layers(out_conv1, out_conv2, out_conv3):
     # set the layer config for extracting the features 
-    
     out_c1 = pooling_to_fixed_value(out_conv1)
     out_c2 = pooling_to_fixed_value(out_conv2)
     out_c3 = pooling_to_fixed_value(out_conv3)
