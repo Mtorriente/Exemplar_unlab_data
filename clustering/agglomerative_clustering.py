@@ -24,10 +24,8 @@ image_names_path = './less_collisions/features_maxpool_allConv.txt'
 
 # source images
 # 1st iteration path
-images_path = '../surrogate_dataset/datos_ampliados/0000/'
-labels = os.listdir(images_path)
-labels.sort()
-nb_classes = len(labels)  #16000 
+images_path = '../surrogate_dataset/unlab_set/'
+
 # load images
 samples = loading_images(features_path)
 # normalize images
@@ -43,17 +41,17 @@ pca_red.fit(samples_L2)
 
 # "reducing" the samples
 samples_L2_pca = pca_red.transform(samples_L2)
-print(samples_L2_pca.shape, samples_L2_pca[0].min(), \
+#print(samples_L2_pca.shape, samples_L2_pca[0].min(), \
       samples_L2_pca[0].max(), np.linalg.norm(samples_L2_pca[0]))
 
 # normalizing the samples again
 samples_L2_pca_L2 = normalizing_samples_L2(samples_L2_pca)
-print(samples_L2_pca_L2.shape, samples_L2_pca_L2[0].min(), \
+#print(samples_L2_pca_L2.shape, samples_L2_pca_L2[0].min(), \
       samples_L2_pca_L2[0].max(), np.linalg.norm(samples_L2_pca_L2[0]))
 
 # agglomerative clustering from scikit learn - 50000 SAMPLES 
 linkage = 'complete'
-clustering = AgglomerativeClustering(linkage=linkage,n_clusters=None,compute_full_tree=True,distance_threshold=2)
+clustering = AgglomerativeClustering(linkage=linkage,n_clusters=None,compute_full_tree=True,distance_threshold=20)
 t0 = time.time()
 clustering.fit(samples_L2_pca_L2)
 print("Clustering time with %s and %d samples: %.2fs" % (linkage, len(samples_L2_pca_L2), time.time() - t0))
@@ -88,7 +86,7 @@ for idx, child in enumerate(children[start:start+nb_im]):
         # if both children from a particular node are leaves and 
         # the associated distance between them is less than thereshold 
         # the images associated to those leaves are clustered.
-          print (distances[start+idx], end = ' * ')
+          #print (distances[start+idx], end = ' * ')
           '''
           image = Image.open(images_path + str(child[0]).zfill(6) + '.png')
           plt.subplot(nb_im,2, num)
@@ -120,9 +118,9 @@ print((num-1)/2)
 #plt.tight_layout()
 plt.show()
 
-print(sub_child_int)
-print('')
-print(sub_child_mixed)
+#print(sub_child_int)
+#print('')
+#print(sub_child_mixed)
 
 larger_clusters = []
 num_3 = 0
@@ -201,13 +199,11 @@ for child in sub_child_mixed:
         num_7 += 1
 
     for img in plot_leaf:
-        image = Image.open(images_path + str(img).zfill(len(str(nb_classes))) + '.png')
+        image = Image.open(images_path + str(img).zfill(4) + '.png')
         plt.subplot(1,nb_img, num)
         plt.imshow(np.asarray(image))
         num += 1
-    print(plot_leaf)
     larger_clusters.append(plot_leaf)
-    print(larger_clusters)
 plt.show()
 
 larger_clusters_2 = []
@@ -334,11 +330,10 @@ for child in sub_child_int:
         num_7 += 1
 
     for img in plot_leaf:
-        image = Image.open(images_path + str(img).zfill(6) + '.png')
+        image = Image.open(images_path + str(img).zfill(4) + '.png')
         plt.subplot(1,nb_img, num)
         plt.imshow(np.asarray(image))
         num += 1
-    print(plot_leaf)
     larger_clusters_2.append(plot_leaf)
 plt.show()
 
