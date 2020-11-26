@@ -16,14 +16,13 @@ import time
 
 import numpy as np
 from PIL import Image
-
+########################################
 #from networks import largest as Net
+######################################3
 
-####################################### CHANGE THE NAME OF THE EXPERIMENT #######################################
 experiment = '083'
 initial_epoch = 0
 resume = False
-#################################################################################################################
 
 nb_epochs = 10 #original 110 epochs
 
@@ -70,7 +69,7 @@ def flatten(x):
     return x.view(x.size(0), -1)
     
 class Net(nn.Module):
-    def __init__(self):
+    def __init__(self,nb_classes):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(3,92,5,1,2)
         self.pool1 = nn.MaxPool2d(3,2)
@@ -100,7 +99,7 @@ class Net(nn.Module):
         out = self.sfmx(out)
         return out
         
-net = Net()
+net = Net(nb_classes)
 initial_lr = 0.01
 
 criterion = nn.CrossEntropyLoss()
@@ -168,7 +167,7 @@ for epoch in range(initial_epoch, nb_epochs):
     for i, data in enumerate(train_loader):
         # get the inputs
         inputs, labels = data
-
+        ########### 128 imagenes 32x32 por cada interacion
         # wrap them in Variable
         #inputs, labels = Variable(inputs).cuda(),  Variable(labels).cuda()
         inputs, labels = Variable(inputs),  Variable(labels)
@@ -199,11 +198,11 @@ for epoch in range(initial_epoch, nb_epochs):
     # epoch finished.
 
     nd = time.time()
-    print('Train time: ' + str(nd-st))
+    #print('Train time: ' + str(nd-st))
 
     lr = [i['lr'] for i in optimizer.param_groups]
-    print ("Current learning rate:")
-    print (lr)
+    #print ("Current learning rate:")
+    #print (lr)
 
     """
     # Dealing with the learning rate:
@@ -227,7 +226,7 @@ for epoch in range(initial_epoch, nb_epochs):
     correct = 0
     total = 0
     running_val_loss = 0
-    print ('Testing on validation...')
+    #print ('Testing on validation...')
     st = time.time()
     for data in val_loader:
         images, labels = data
@@ -248,7 +247,7 @@ for epoch in range(initial_epoch, nb_epochs):
                                                                                                     # the number of iterations
                                                                                                     # needed to see all the validation set
     print('Validation accuracy: %.3f %%' % (100 * correct / float(total)))
-    print('Validation time: ' + str(nd-st))
+    #print('Validation time: ' + str(nd-st))
     val_loss_history.append(running_val_loss /  (len(val_set)/batch_size))
     accuracy_val_history.append(100 * correct / total)
 
@@ -257,7 +256,7 @@ for epoch in range(initial_epoch, nb_epochs):
     if not os.path.exists('./saving_model/exp' + str(experiment)):
         os.mkdir('./saving_model/exp' + str(experiment) )
     is_best = False
-    print('Saving model...')
+    #print('Saving model...')
     save_checkpoint({
                 'epoch': epoch + 1,
                 'state_dict': net.state_dict(),
