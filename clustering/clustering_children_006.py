@@ -29,7 +29,7 @@ path_single_old_classes = './less_collisions/old_classes_' + iteration_nb + '/'
 #Este lo añado yo que no aparecia definido
 path_target_dset = './less_collisions'
 # source images
-images_path = '../surrogate_dataset/datos_ampliados/0000/'
+images_path = '../surrogate_dataset/unlab_set/'
 
 short_clusters = []
 larger_clusters = []
@@ -64,7 +64,7 @@ print("sub_child_mixed_array:",len(larger_clusters), type(larger_clusters), larg
 
 # we need a set with all the 100k images from the dataset
 samples_full = os.listdir(images_path)
-
+nb_samples = len(samples_full)
 samples_full_set = set([int(sample_i[:-4]) for sample_i in samples_full])
 print (len(samples_full), len(samples_full_set), type(samples_full_set))
 
@@ -87,12 +87,12 @@ for cluster_l in larger_clusters:
             temp +=1    # variable to count clusters
             
             ## defining paths 
-            if not os.path.exists(join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(2))):
-                os.makedirs(join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(2)))
+            if not os.path.exists(join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(len(str(nb_samples))))):
+                os.makedirs(join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(len(str(nb_samples)))))
                 # 'cl_l' stands for clusters large
             
-            src_path = join(images_path, str(sample_l).zfill(2) + '.png')
-            dst_path = join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(2), str(sample_l).zfill(2) + '.png')
+            src_path = join(images_path, str(sample_l).zfill(len(str(nb_samples))) + '.png')
+            dst_path = join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(len(str(nb_samples))), str(sample_l).zfill(len(str(nb_samples))) + '.png')
             
             ## moving files to the new clusterred dataset
             shutil.copyfile(src_path, dst_path)
@@ -124,12 +124,12 @@ for cluster_s in short_clusters:
             temp +=1    # variable to count clusters
             
             ## defining paths 
-            if not os.path.exists(join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(2))):
-                os.makedirs(join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(2)))
+            if not os.path.exists(join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(len(str(nb_samples))))):
+                os.makedirs(join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(len(str(nb_samples)))))
                 # 'cl_l' stands for clusters large
             
-            src_path = join(images_path, str(sample_s).zfill(2) + '.png')
-            dst_path = join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(2), str(sample_s).zfill(2) + '.png')
+            src_path = join(images_path, str(sample_s).zfill(len(str(nb_samples))) + '.png')
+            dst_path = join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(len(str(nb_samples))), str(sample_s).zfill(len(str(nb_samples))) + '.png')
             
             ## moving files to the new clusterred dataset
             shutil.copyfile(src_path, dst_path)
@@ -167,8 +167,8 @@ if not os.path.exists(path_new_classes):
     os.makedirs(path_new_classes)           
 
 for idx in tqdm(single_samples):
-    path = os.path.join(path_new_classes, str(idx).zfill(2))
-    image = Image.open(images_path + str(idx).zfill(2) + '.png')
+    path = os.path.join(path_new_classes, str(idx).zfill(len(str(nb_samples))))
+    image = Image.open(images_path + str(idx).zfill(len(str(nb_samples))) + '.png')
     samples_full_set.remove(idx)
     image.save(path + '.png') 
 print ("Set length after processing the short clusters: ",len(samples_set_s))
@@ -188,7 +188,7 @@ samples_L2 = normalizing_samples_L2(samples)
 
 query_mtx = np.zeros([len(single_images), len(samples_L2[0])])
 query_names = []
-single_images.pop(0)
+#single_images.pop(0)
 for num, sample_i in enumerate(single_images):
     query = samples_L2[int(sample_i[:-4])]
     query_names.append(sample_i)
@@ -209,7 +209,7 @@ for num, sample_i in enumerate(query_names):
     instance_num = 1
     while len(cluster_i)<cluster_size and instance_num<15:
         image_nb = ranks[num][instance_num]
-        image_name = str(image_nb).zfill(6) + '.png'
+        image_name = str(image_nb).zfill(len(str(nb_samples))) + '.png'
         if image_nb in samples_full_set:
             cluster_i.append(image_name)
             samples_full_set.remove(image_nb)
