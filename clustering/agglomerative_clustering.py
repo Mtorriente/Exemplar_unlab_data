@@ -41,13 +41,11 @@ pca_red.fit(samples_L2)
 
 # "reducing" the samples
 samples_L2_pca = pca_red.transform(samples_L2)
-#print(samples_L2_pca.shape, samples_L2_pca[0].min(), \
-      samples_L2_pca[0].max(), np.linalg.norm(samples_L2_pca[0]))
+#print(samples_L2_pca.shape, samples_L2_pca[0].min(), \samples_L2_pca[0].max(), np.linalg.norm(samples_L2_pca[0]))
 
 # normalizing the samples again
 samples_L2_pca_L2 = normalizing_samples_L2(samples_L2_pca)
-#print(samples_L2_pca_L2.shape, samples_L2_pca_L2[0].min(), \
-      samples_L2_pca_L2[0].max(), np.linalg.norm(samples_L2_pca_L2[0]))
+#print(samples_L2_pca_L2.shape, samples_L2_pca_L2[0].min(), \samples_L2_pca_L2[0].max(), np.linalg.norm(samples_L2_pca_L2[0]))
 
 # agglomerative clustering from scikit learn - 50000 SAMPLES 
 linkage = 'complete'
@@ -63,8 +61,8 @@ leaves = clustering.n_leaves_
 print("Number of leaves:", end = '')
 print(leaves)
 
-plt.plot(distances) #volver a este punto, 
-plt.show()
+#plt.plot(distances) #volver a este punto, 
+#plt.show()
 
 children.shape
 
@@ -77,8 +75,8 @@ sub_child_int = []
 sub_child_mixed = []
 
 num =1
-print ('Distances:')
-plt.figure(figsize=(10,nb_im*4))
+#print ('Distances:')
+#plt.figure(figsize=(10,nb_im*4))
 for idx, child in enumerate(children[start:start+nb_im]):
     #print (distances[start+idx], end = ' * ')
     if (child<leaves).all():
@@ -110,13 +108,13 @@ for idx, child in enumerate(children[start:start+nb_im]):
         # if both children from a particular node are internal nodes
         sub_child_mixed.append(child)
         
-print(end = '\n\n')
+#print(end = '\n\n')
 print("Nodes requested: ", end = '')
 print(nb_im)
 print("Nodes showed: ", end = '')
 print((num-1)/2)
 #plt.tight_layout()
-plt.show()
+#plt.show()
 
 #print(sub_child_int)
 #print('')
@@ -131,7 +129,7 @@ num_7 = 0
 
 for child in sub_child_mixed:
     plot_leaf = []
-    plt.figure()
+    #plt.figure()
     plot_leaf.append(min(child))
     new_idx = max(child)-leaves
     if (children[new_idx]<leaves).all():
@@ -200,8 +198,8 @@ for child in sub_child_mixed:
 
     for img in plot_leaf:
         image = Image.open(images_path + str(img).zfill(4) + '.png')
-        plt.subplot(1,nb_img, num)
-        plt.imshow(np.asarray(image))
+        #plt.subplot(1,nb_img, num)
+        #plt.imshow(np.asarray(image))
         num += 1
     larger_clusters.append(plot_leaf)
 plt.show()
@@ -215,7 +213,7 @@ num_7 = 0
 
 for child in sub_child_int:
     plot_leaf = []
-    plt.figure()
+    #plt.figure()
 
     new_idx = min(child)-leaves
     if (children[new_idx]<leaves).all():
@@ -331,11 +329,11 @@ for child in sub_child_int:
 
     for img in plot_leaf:
         image = Image.open(images_path + str(img).zfill(4) + '.png')
-        plt.subplot(1,nb_img, num)
-        plt.imshow(np.asarray(image))
+        #plt.subplot(1,nb_img, num)
+        #plt.imshow(np.asarray(image))
         num += 1
     larger_clusters_2.append(plot_leaf)
-plt.show()
+#plt.show()
 
 num_3, num_4, num_5, num_6, num_7
 
