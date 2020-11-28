@@ -87,14 +87,15 @@ for cluster_l in larger_clusters:
             temp +=1    # variable to count clusters
             
             ## defining paths 
-            if not os.path.exists(join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(len(str(nb_samples))))):
-                os.makedirs(join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(len(str(nb_samples)))))
+            if not os.path.exists(join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(4))):
+                os.makedirs(join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(4)))
                 # 'cl_l' stands for clusters large
             
-            src_path = join(images_path, str(sample_l).zfill(len(str(nb_samples))) + '.png')
-            dst_path = join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(len(str(nb_samples))), str(sample_l).zfill(len(str(nb_samples))) + '.png')
+            src_path = join(images_path, str(sample_l).zfill(4) + '.png')
+            dst_path = join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(4), str(sample_l).zfill(4) + '.png')
             
             ## moving files to the new clusterred dataset
+            print(src_path,dst_path)
             shutil.copyfile(src_path, dst_path)
             
             #### ploting...
@@ -124,12 +125,12 @@ for cluster_s in short_clusters:
             temp +=1    # variable to count clusters
             
             ## defining paths 
-            if not os.path.exists(join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(len(str(nb_samples))))):
-                os.makedirs(join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(len(str(nb_samples)))))
+            if not os.path.exists(join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(4))):
+                os.makedirs(join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(4)))
                 # 'cl_l' stands for clusters large
             
-            src_path = join(images_path, str(sample_s).zfill(len(str(nb_samples))) + '.png')
-            dst_path = join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(len(str(nb_samples))), str(sample_s).zfill(len(str(nb_samples))) + '.png')
+            src_path = join(images_path, str(sample_s).zfill(4) + '.png')
+            dst_path = join(path_target_dset_s_cl, 'cl_s_' + str(cluster_number).zfill(4), str(sample_s).zfill(4) + '.png')
             
             ## moving files to the new clusterred dataset
             shutil.copyfile(src_path, dst_path)
@@ -167,8 +168,8 @@ if not os.path.exists(path_new_classes):
     os.makedirs(path_new_classes)           
 
 for idx in tqdm(single_samples):
-    path = os.path.join(path_new_classes, str(idx).zfill(len(str(nb_samples))))
-    image = Image.open(images_path + str(idx).zfill(len(str(nb_samples))) + '.png')
+    path = os.path.join(path_new_classes, str(idx).zfill(4))
+    image = Image.open(images_path + str(idx).zfill(4) + '.png')
     samples_full_set.remove(idx)
     image.save(path + '.png') 
 print ("Set length after processing the short clusters: ",len(samples_set_s))
@@ -209,7 +210,7 @@ for num, sample_i in enumerate(query_names):
     instance_num = 1
     while len(cluster_i)<cluster_size and instance_num<15:
         image_nb = ranks[num][instance_num]
-        image_name = str(image_nb).zfill(len(str(nb_samples))) + '.png'
+        image_name = str(image_nb).zfill(4) + '.png'
         if image_nb in samples_full_set:
             cluster_i.append(image_name)
             samples_full_set.remove(image_nb)
