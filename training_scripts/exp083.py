@@ -1,3 +1,4 @@
+
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -5,30 +6,28 @@ import torchvision.datasets as datasets
 
 from matplotlib import pyplot as plt
 
+
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
 
 import torch.optim as optim
-
+import tensorflow as tf
 import os
 import time
 
 import numpy as np
 from PIL import Image
-########################################
-#from networks import largest as Net
-######################################3
 
+from networks import largest as Net
+
+####################################### CHANGE THE NAME OF THE EXPERIMENT #######################################
 experiment = '083'
 initial_epoch = 0
 resume = False
-###################################
-# Se cargan los datos con dataLoader, se define la CNN y se entrena con los datos. 
-# Se guarda el módelo 
-####################################
+#################################################################################################################
 
-nb_epochs = 10 #original 110 epochs
+nb_epochs = 10
 
 def save_checkpoint(state, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
@@ -43,74 +42,44 @@ Differences:
 - Lower LR in the last layer
 - 2.0* LR for the biases always
 - 0.0 WD for the biases always
-
 Added now:
 - 3x3 maxpooling
-
 '''
 
 # preparing datasets for training and validation
-batch_size = 128  
+batch_size = 128
 mean = [0.383661700858527, 0.3819784115384924, 0.3588786631614881]
 std=[0.2167717755518767, 0.21201058526724945, 0.21143164036556178]
-normalize = transforms.Normalize(mean = mean, std=std)
-#############################
-# Se cargan los datos de entrenamiento
-train_set = datasets.ImageFolder('./surrogate_dataset/train_set/', transform = transforms.Compose([transforms.ToTensor(), normalize]))
-train_loader = torch.utils.data.DataLoader(train_set,batch_size = batch_size,shuffle = True, )
-val_set = datasets.ImageFolder('./surrogate_dataset/val_set/',transform = transforms.Compose([transforms.ToTensor(), normalize]))
-val_loader = torch.utils.data.DataLoader(val_set,batch_size = batch_size,shuffle = False, )
-nb_classes = len(os.listdir('./surrogate_dataset/train_set/'))
+normalize = transforms.Normalize(mean = mean,
+                                 std=std)
+train_set = datasets.ImageFolder('./surrogate_dataset/train_set/',
+                                  transform = transforms.Compose([transforms.ToTensor(), normalize]))
+train_loader = torch.utils.data.DataLoader(train_set,
+                                           batch_size = batch_size,
+                                           shuffle = True,
+                                           )
+val_set = datasets.ImageFolder('./surrogate_dataset/val_set/',
+                                  transform = transforms.Compose([transforms.ToTensor(), normalize]))
+val_loader = torch.utils.data.DataLoader(val_set,
+                                           batch_size = batch_size,
+                                           shuffle = False,
+                                           )
 
+nb_classes = len(os.listdir('./surrogate_dataset/train_set/'))
 print ("Training with " + str(nb_classes) + " classes")
 
 # define a CNN
-#net = Net(nb_classes).cuda()
+net = Net(nb_classes).cuda()
 print ("Model defined")
 print ("Model to GPU")
 
-#Añado esta NET por mí, porque hacia referencia a una lib networks que no encuentro
-def flatten(x):
-    """Flattens a tensor."""
-    return x.view(x.size(0), -1)
-    
-class Net(nn.Module):
-    def __init__(self,nb_classes):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3,92,5,1,2)
-        self.pool1 = nn.MaxPool2d(3,2)
-        self.drop1 = nn.Dropout2d(0.25)
-        self.conv2 = nn.Conv2d(92,256,5,1,2)
-        self.relu = nn.ReLU()
-        self.pool2 = nn.MaxPool2d(3,2)
-        self.drop2 = nn.Dropout2d(0.25)
-        self.conv3 = nn.Conv2d(256,512,5,padding=2)
-        self.drop3 = nn.Dropout2d(0.25)
-        self.flat = flatten
-        self.fc1 = nn.Linear(25088,1024)
-        self.dropDense1 = nn.Dropout2d(0.5)
-        self.fc2 = nn.Linear(1024,16000)
-        self.sfmx = nn.Softmax(1)
 
-    def forward(self, x):
-        out = self.pool1(self.relu(self.conv1(x)))
-        out = self.drop1(out)
-        out = self.pool2(self.relu(self.conv2(out)))
-        out = self.drop2(out)
-        out = self.drop3(self.relu(self.conv3(out)))
-        out = self.flat(out)
-        out = self.relu(self.fc1(out))
-        out = self.dropDense1(out)
-        out = self.relu(self.fc2(out))
-        out = self.sfmx(out)
-        return out
-        
-net = Net(nb_classes) ###
 initial_lr = 0.01
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr = initial_lr, momentum = 0.9, weight_decay = 1e-4)
 lr = optimizer.param_groups[0]['lr']
+print ("Initial learning rate: " + str(lr))
 
 # Start training
 loss_history = []
@@ -130,9 +99,21 @@ print ("\tMomentum: ",optimizer.param_groups[0]['momentum'])
 print ('')
 ################################################################
 
+################################################################
+
 # Changing WD and LRs
 WD = 0.004
 current_lr = initial_lr
+
+#### Following initialization is for an optimizer that deals with the bias and the weights the same way
+'''
+optimizer = optim.SGD([{'params': net.conv1.parameters(), 'weight_decay': WD*0.0},
+                       {'params': net.conv2.parameters(), 'weight_decay': WD*0.0},
+                       {'params': net.conv3.parameters(), 'weight_decay': WD*0.25},
+                       {'params': net.fc1.parameters(), 'weight_decay': WD*1.0},
+                       {'params': net.fc2.parameters(), 'lr': current_lr*0.25 , 'weight_decay': WD*4.0}],
+                      lr = 0.01, momentum = 0.9)
+'''
 
 #### Following initialization is for an optimizer that distinguishes between bias and weights
 #### Is the same as the code provided in the github:
@@ -152,30 +133,28 @@ optimizer = optim.SGD([{'params': net.conv1.weight, 'weight_decay': WD*0.0},
 
 #################### Printing optimizer configuration ########################
 print ('')
-print ("Optimizer (changing parameters): ")
-print ("\tDampening: ",[str(i['dampening']) for i in optimizer.param_groups])
-print ("\tNesterov: ",[str(i['nesterov']) for i in optimizer.param_groups])
-#print "\tparams: ",
-#print optimizer.param_groups[0]['params']
-print ("\tLR: ",[str(i['lr']) for i in optimizer.param_groups])
-print ("\tWeight_decay: ",[str(i['weight_decay']) for i in optimizer.param_groups])
-print ("\tMomentum: ",[str(i['momentum']) for i in optimizer.param_groups])
-#{'dampening': 0, 'nesterov': False, 'params': 1, , 'lr': 0.01, 'weight_decay': 0, 'momentum': 0.9}
+print ("Optimizer (initial): ")
+print ("\tDampening: ",optimizer.param_groups[0]['dampening'])
+print ("\tNesterov: ",optimizer.param_groups[0]['nesterov'])
+print ("\tLR: ",optimizer.param_groups[0]['lr'])
+print ("\tWeight_decay: ",optimizer.param_groups[0]['weight_decay'])
+print ("\tMomentum: ",optimizer.param_groups[0]['momentum'])
 print ('')
+################################################################
+
 ################################################################
 st = time.time()
 
+
 for epoch in range(initial_epoch, nb_epochs):
-    print ('Training epoch ' + str(epoch + 1).zfill(len(str(nb_epochs))))
+    print ('Training epoch ' + str(epoch + 1).zfill(3))
     st = time.time()
     running_loss = 0.0
     for i, data in enumerate(train_loader):
         # get the inputs
         inputs, labels = data
-        ########### 128 imagenes 32x32 por cada interacion
         # wrap them in Variable
-        #inputs, labels = Variable(inputs).cuda(),  Variable(labels).cuda()
-        inputs, labels = Variable(inputs),  Variable(labels)
+        inputs, labels = Variable(inputs).cuda(),  Variable(labels).cuda()
 
         # zero the parameter gradients
         optimizer.zero_grad()
@@ -183,10 +162,15 @@ for epoch in range(initial_epoch, nb_epochs):
         # forward + backward + optimize
         outputs = net(inputs)
         loss = criterion(outputs, labels)
+        
         loss.backward()
         optimizer.step()
-        running_loss += loss.data
-        loss_history.append(loss.data)
+
+        # print statistics
+        # loss
+        
+        running_loss += loss.data.item()
+        loss_history.append(loss.data.item())
 
         # accuracy
         correct = 0
@@ -203,11 +187,10 @@ for epoch in range(initial_epoch, nb_epochs):
     # epoch finished.
 
     nd = time.time()
-    #print('Train time: ' + str(nd-st))
+    print('Train time: ' + str(nd-st))
 
     lr = [i['lr'] for i in optimizer.param_groups]
-    #print ("Current learning rate:")
-    #print (lr)
+    print ("Current learning rate:",lr)
 
     """
     # Dealing with the learning rate:
@@ -216,27 +199,23 @@ for epoch in range(initial_epoch, nb_epochs):
     if epoch == 75 or epoch == 92:
         for idx, param_group in enumerate(optimizer.param_groups):
             param_group['lr'] = lr[idx]*0.4
-        print ('New learning rate: ')
-        lr = [i['lr'] for i in optimizer.param_groups]
+        print ('New learning rate: ',lr = [i['lr'] for i in optimizer.param_groups])
         print (lr)
 
     if epoch == 85 or epoch == 100:
         for idx, param_group in enumerate(optimizer.param_groups):
             param_group['lr'] = lr[idx]*0.25
-        print ('New learning rate: ')
-        lr = [i['lr'] for i in optimizer.param_groups]
-        print (lr)
+        print ('New learning rate: ',lr = [i['lr'] for i in optimizer.param_groups])
 
     # evaluating on validation set
     correct = 0
     total = 0
     running_val_loss = 0
-    #print ('Testing on validation...')
+    print ('Testing on validation...')
     st = time.time()
     for data in val_loader:
         images, labels = data
-        #images, labels = Variable(images).cuda(),  Variable(labels).cuda()
-        images, labels = Variable(images),  Variable(labels)
+        images, labels = Variable(images).cuda(),  Variable(labels).cuda()
 
         outputs = net(images)
         _, predicted = torch.max(outputs.data, 1)
@@ -244,15 +223,14 @@ for epoch in range(initial_epoch, nb_epochs):
         correct += (predicted == labels.data).sum()
 
         loss = criterion(outputs, labels)
-        #running_val_loss += loss.data[0]
-        running_val_loss += loss.data
+        running_val_loss += loss.data.item()
 
     nd = time.time()
     print('Validation loss: %.3f' % (running_val_loss / (len(val_set)/batch_size)))   # we divide the loss by
-                                                                                                    # the number of iterations
+                                                                                                    # the number of itereations
                                                                                                     # needed to see all the validation set
     print('Validation accuracy: %.3f %%' % (100 * correct / float(total)))
-    #print('Validation time: ' + str(nd-st))
+    print('Validation time: ' + str(nd-st))
     val_loss_history.append(running_val_loss /  (len(val_set)/batch_size))
     accuracy_val_history.append(100 * correct / total)
 
@@ -261,7 +239,7 @@ for epoch in range(initial_epoch, nb_epochs):
     if not os.path.exists('./saving_model/exp' + str(experiment)):
         os.mkdir('./saving_model/exp' + str(experiment) )
     is_best = False
-    #print('Saving model...')
+    print('Saving model...')
     save_checkpoint({
                 'epoch': epoch + 1,
                 'state_dict': net.state_dict(),
@@ -291,3 +269,4 @@ save_checkpoint({
         }, filename = path)
 
 print ('Model saved in: ' + path)
+
