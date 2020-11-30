@@ -4,8 +4,9 @@ from PIL import Image
 from skimage import color
 from skimage.filters import sobel
 from tqdm import tqdm
-
-# Converting the class images into "edge masks"
+################################################
+# Crea una carpeta con los contornos de todas las imagenes de entrada
+################################################
 out_path = './surrogate_dataset/edge_masks/'
 in_path = './surrogate_dataset/classes/'
 
