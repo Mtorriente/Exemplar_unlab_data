@@ -12,7 +12,7 @@ import numpy as np
 from tqdm import tqdm
 import sys
 
-#from networks import largest as Net
+from networks import largest as Net
 import h5py
 
 from sklearn.decomposition import PCA
@@ -69,46 +69,9 @@ f_names = open(image_names, 'w')
 for i in image_list:
     f_names.write(i + '\n')    
 f_names.close()
-
-# instantiating the net
-#Añadida esta NET por mí, porque hacia referencia a una lib networks que no encuentro
-def flatten(x):
-    """Flattens a tensor."""
-    return x.view(x.size(0), -1)
-
-class Net(nn.Module):
-    def __init__(self,nb_classes):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3,92,5,1,2)
-        self.pool1 = nn.MaxPool2d(3,2)
-        self.drop1 = nn.Dropout2d(0.25)
-        self.conv2 = nn.Conv2d(92,256,5,1,2)
-        self.relu = nn.ReLU()
-        self.pool2 = nn.MaxPool2d(3,2)
-        self.drop2 = nn.Dropout2d(0.25)
-        self.conv3 = nn.Conv2d(256,512,5,padding=2)
-        self.drop3 = nn.Dropout2d(0.25)
-        self.flat = flatten
-        self.fc1 = nn.Linear(25088,1024)
-        self.dropDense1 = nn.Dropout2d(0.5)
-        self.fc2 = nn.Linear(1024,16000)
-        self.sfmx = nn.Softmax(1)
-
-    def forward(self, x):
-        out = self.pool1(self.relu(self.conv1(x)))
-        out = self.drop1(out)
-        out = self.pool2(self.relu(self.conv2(out)))
-        out = self.drop2(out)
-        out = self.drop3(self.relu(self.conv3(out)))
-        out = self.flat(out)
-        out = self.relu(self.fc1(out))
-        out = self.dropDense1(out)
-        out = self.relu(self.fc2(out))
-        out = self.sfmx(out)
-        return out
         
 # instantiating the net
-net = Net(nb_classes)
+net = Net(nb_classes).cuda()
 # defining transformations:
 normalize = transforms.Normalize(mean = mean, std=std)
 transf = transforms.Compose([transforms.ToTensor(), normalize])
@@ -134,60 +97,6 @@ def process_features_batch(out_conv1, out_conv2, out_conv3, batch_size):
     out_f = out_c.squeeze().cpu().data.view(batch_size, -1).numpy()
     return out_f
 
-class Net1(nn.Module):
-    def __init__(self):
-        super(Net1, self).__init__()
-        self.conv1 = nn.Conv2d(3,92,5,1,2)
-        self.pool1 = nn.MaxPool2d(3,2)
-        self.relu = nn.ReLU()
-
-    def forward(self, x):
-        out = self.pool1(self.relu(self.conv1(x)))
-        return out
-        
-net1 = Net1()
-
-class Net2(nn.Module):
-    def __init__(self):
-        super(Net2, self).__init__()
-        self.conv1 = nn.Conv2d(3,92,5,1,2)
-        self.pool1 = nn.MaxPool2d(3,2)
-        self.drop1 = nn.Dropout2d(0.25)
-        self.conv2 = nn.Conv2d(92,256,5,1,2)
-        self.relu = nn.ReLU()
-        self.pool2 = nn.MaxPool2d(3,2)
-       
-    def forward(self, x):
-        out = self.pool1(self.relu(self.conv1(x)))
-        out = self.drop1(out)
-        out = self.pool2(self.relu(self.conv2(out)))
-        return out
-        
-net2 = Net2()
-
-class Net3(nn.Module):
-    def __init__(self):
-        super(Net3, self).__init__()
-        self.conv1 = nn.Conv2d(3,92,5,1,2)
-        self.pool1 = nn.MaxPool2d(3,2)
-        self.drop1 = nn.Dropout2d(0.25)
-        self.conv2 = nn.Conv2d(92,256,5,1,2)
-        self.relu = nn.ReLU()
-        self.pool2 = nn.MaxPool2d(3,2)
-        self.drop2 = nn.Dropout2d(0.25)
-        self.conv3 = nn.Conv2d(256,512,5,padding=2)
-
-    def forward(self, x):
-        out = self.pool1(self.relu(self.conv1(x)))
-        out = self.drop1(out)
-        out = self.pool2(self.relu(self.conv2(out)))
-        out = self.drop2(out)
-        out = self.relu(self.conv3(out))
-        return out
-        
-net3 = Net3()
-
-
 batch_size = 9
 idx = 0
 ##############################################3
@@ -201,14 +110,13 @@ for iteration in tqdm(range(int(len(image_list)/batch_size))):
         image = transf(image)
         images[num] = image.float()
 
-    samples = Variable(images)
+    samples = Variable(images).cuda()
 
     net.train(False)
-    out_conv1 = net1(samples)
-    out_conv2 = net2(samples)
-    out_conv3 = net3(samples)
-    out_f = process_features_batch(out_conv1, out_conv2, out_conv3, batch_size)
+    (out_conv1, out_conv2, out_conv3) = net.forward_all_conv_feat(samples)
 
+    out_f = process_features_batch(out_conv1, out_conv2, out_conv3, batch_size)
+    
     if "/features" not in f_h5py:
         f_h5py.create_dataset('features', shape = (nb_images, out_f.shape[1]), dtype = np.float32)
 

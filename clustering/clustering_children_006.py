@@ -95,7 +95,6 @@ for cluster_l in larger_clusters:
             dst_path = join(path_target_dset_l_cl, 'cl_l_' + str(cluster_number).zfill(4), str(sample_l).zfill(4) + '.png')
             
             ## moving files to the new clusterred dataset
-            print(src_path,dst_path)
             shutil.copyfile(src_path, dst_path)
             
             #### ploting...
