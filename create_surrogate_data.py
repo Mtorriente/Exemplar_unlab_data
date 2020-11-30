@@ -21,6 +21,10 @@ import sys
 from tqdm import tqdm
 
 np.random.seed(42) #se repiten los numeros aleatorios cada 42 numeros
+#############################################
+# Aplica una serie de transformaciones a las imagenes de entrada. 
+# Se guardan las transformaciones por cada imagen en carpetas por separado en data
+##################################################
 
 # General variables
 root_path = './surrogate_dataset/'
@@ -35,7 +39,7 @@ st = time.time()
 
 #nb_samples = 125   # This correspond to the number of transformations
 # I reduced to 112 to reduce the generation and training time... The split will be 90/10
-nb_samples = 112 #112
+nb_samples = 15 #112
 
 # importing transformations
 sys.path.append('./')
@@ -67,13 +71,13 @@ hsv_color = HSV_color(hsv_add_color)
 
 # Here start a for loop to go through all the classes
 for label_ind in tqdm(labels):
-    directory = join(root_path, 'data', str(label_ind).split('.')[0].zfill(len(str(nb_classes))))
+    #Por cada imagen de entrada, se crea una carpeta en data
+    directory = join(root_path, 'data', str(int(str(label_ind).split('.')[0].zfill(len(str(nb_classes)))))) #Convierto a int->str para simplificar el nombre de las carpetas en data
     if not os.path.exists(directory):
         os.makedirs(directory)
     
     image = Image.open(classes_path + '/' + str(label_ind).zfill(len(str(nb_classes))))
     mask = Image.open(mask_path + '/' + str(label_ind).zfill(len(str(nb_classes)))[:-4] + '_edge.png')
-
     anchor = Get_coord_from_mask(mask, 1)
     min_scale = 0.7#output_size/np.min(image.size) # 0.7 # measure for STL10 images (96x96)
     scales = (min_scale, max_scale)
