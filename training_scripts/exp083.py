@@ -23,6 +23,10 @@ from PIL import Image
 experiment = '083'
 initial_epoch = 0
 resume = False
+###################################
+# Se cargan los datos con dataLoader, se define la CNN y se entrena con los datos. 
+# Se guarda el módelo 
+####################################
 
 nb_epochs = 10 #original 110 epochs
 
@@ -50,6 +54,8 @@ batch_size = 128
 mean = [0.383661700858527, 0.3819784115384924, 0.3588786631614881]
 std=[0.2167717755518767, 0.21201058526724945, 0.21143164036556178]
 normalize = transforms.Normalize(mean = mean, std=std)
+#############################
+# Se cargan los datos de entrenamiento
 train_set = datasets.ImageFolder('./surrogate_dataset/train_set/', transform = transforms.Compose([transforms.ToTensor(), normalize]))
 train_loader = torch.utils.data.DataLoader(train_set,batch_size = batch_size,shuffle = True, )
 val_set = datasets.ImageFolder('./surrogate_dataset/val_set/',transform = transforms.Compose([transforms.ToTensor(), normalize]))
@@ -99,13 +105,12 @@ class Net(nn.Module):
         out = self.sfmx(out)
         return out
         
-net = Net(nb_classes)
+net = Net(nb_classes) ###
 initial_lr = 0.01
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr = initial_lr, momentum = 0.9, weight_decay = 1e-4)
 lr = optimizer.param_groups[0]['lr']
-print ("Initial learning rate: " + str(lr))
 
 # Start training
 loss_history = []
@@ -147,7 +152,7 @@ optimizer = optim.SGD([{'params': net.conv1.weight, 'weight_decay': WD*0.0},
 
 #################### Printing optimizer configuration ########################
 print ('')
-print ("Optimizer (cahnging parameters): ")
+print ("Optimizer (changing parameters): ")
 print ("\tDampening: ",[str(i['dampening']) for i in optimizer.param_groups])
 print ("\tNesterov: ",[str(i['nesterov']) for i in optimizer.param_groups])
 #print "\tparams: ",
@@ -161,7 +166,7 @@ print ('')
 st = time.time()
 
 for epoch in range(initial_epoch, nb_epochs):
-    print ('Training epoch ' + str(epoch + 1).zfill(3))
+    print ('Training epoch ' + str(epoch + 1).zfill(len(str(nb_epochs))))
     st = time.time()
     running_loss = 0.0
     for i, data in enumerate(train_loader):
