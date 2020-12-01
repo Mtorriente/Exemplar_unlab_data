@@ -72,7 +72,7 @@ hsv_color = HSV_color(hsv_add_color)
 # Here start a for loop to go through all the classes
 for label_ind in tqdm(labels):
     #Por cada imagen de entrada, se crea una carpeta en data
-    directory = join(root_path, 'data', str(int(str(label_ind).split('.')[0].zfill(len(str(nb_classes)))))) #Convierto a int->str para simplificar el nombre de las carpetas en data
+    directory = join(root_path, 'data', str(label_ind).split('.')[0].zfill(len(str(nb_classes)))) 
     if not os.path.exists(directory):
         os.makedirs(directory)
     
