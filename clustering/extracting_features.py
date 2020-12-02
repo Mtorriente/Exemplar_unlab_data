@@ -6,7 +6,11 @@ import torch.optim as optim
 from torch.autograd import Variable
 import torch.nn.functional as F
 from PIL import Image
-
+#############################################################
+# Se extraen las caracteristicas con el modelo anterioremente entrenado, y un conjunto de imagenes
+# distinto al anterior.
+# Se guardan las features en un fichero hdf
+############################################################ 
 from torchvision import transforms, datasets
 import numpy as np
 from tqdm import tqdm
