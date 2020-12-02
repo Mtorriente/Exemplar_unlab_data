@@ -3,7 +3,10 @@ import numpy as np
 import h5py
 from PIL import Image
 import matplotlib.pyplot as plt
-
+#######################################################
+# Se cargan las caracteristicas de cada imagen anterioremente calculadas
+# Se agrupan los hojas del arbol teniendo en cuenta el umbral
+########################################################
 import sys
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.decomposition import PCA
