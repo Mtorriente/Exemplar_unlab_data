@@ -106,11 +106,13 @@ idx = 0
 ##############################################3
 images = torch.zeros((batch_size, 3, 96, 96))
 f_h5py = h5py.File(output_path, 'w')
-
+cambio = (96,96)
 for iteration in tqdm(range(int(len(image_list)/batch_size))):
     
     for num, image in enumerate(image_list[idx:idx+batch_size]):
         image = Image.open(images_path + image)
+        image = image.resize(cambio)
+        image = image.convert('RGB')
         image = transf(image)
         images[num] = image.float()
 
