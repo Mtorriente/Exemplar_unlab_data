@@ -8,12 +8,14 @@ import matplotlib.pyplot as plt
 # Se agrupan los hojas del arbol teniendo en cuenta el umbral
 ########################################################
 import sys
-from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import AgglomerativeClustering_dist
 from sklearn.decomposition import PCA
 
 import time
 import os
 from utils_clust import normalizing_samples_L2, loading_images, searching_similar_images
+
+import csv
 
 # To save pairs of children...
 iteration_nb = '001'
@@ -27,7 +29,9 @@ image_names_path = './less_collisions/features_maxpool_allConv.txt'
 
 # source images
 # 1st iteration path
-images_path = '../surrogate_dataset/unlab_set/'
+crimefile = open(image_names_path, 'r')
+reader = csv.reader(crimefile)
+allRows = [row for row in reader]
 
 # load images
 samples = loading_images(features_path)
@@ -52,17 +56,16 @@ samples_L2_pca_L2 = normalizing_samples_L2(samples_L2_pca)
 
 # agglomerative clustering from scikit learn - 50000 SAMPLES 
 linkage = 'complete'
-clustering = AgglomerativeClustering(linkage=linkage,n_clusters=None,compute_full_tree=True,distance_threshold=20)
+clustering = AgglomerativeClustering_dist(linkage=linkage, n_clusters=1, compute_full_tree = True, return_distance = True)
 t0 = time.time()
 clustering.fit(samples_L2_pca_L2)
 print("Clustering time with %s and %d samples: %.2fs" % (linkage, len(samples_L2_pca_L2), time.time() - t0))
 
 children = clustering.children_
-distances = clustering.distances_
+distances = clustering.distances
 # The leaves correspond to the samples introduced
 leaves = clustering.n_leaves_
-print("Number of leaves:", end = '')
-print(leaves)
+print("Number of leaves:",leaves)
 
 #plt.plot(distances) #volver a este punto, 
 #plt.show()
@@ -111,17 +114,13 @@ for idx, child in enumerate(children[start:start+nb_im]):
         # if both children from a particular node are internal nodes
         sub_child_mixed.append(child)
         
-#print(end = '\n\n')
-print("Nodes requested: ", end = '')
-print(nb_im)
-print("Nodes showed: ", end = '')
-print((num-1)/2)
+print("Nodes requested: ",nb_im)
+print("Nodes showed: ", (num-1)/2)
 #plt.tight_layout()
 #plt.show()
 
-#print(sub_child_int)
-#print('')
-#print(sub_child_mixed)
+print('Number of children made by internal nodes:',len(sub_child_int))
+print('Number of children made by mixed node and leave:',len(sub_child_mixed))
 
 larger_clusters = []
 num_3 = 0
@@ -200,9 +199,10 @@ for child in sub_child_mixed:
         num_7 += 1
 
     for img in plot_leaf:
-        image = Image.open(images_path + str(img).zfill(4) + '.png')
-        #plt.subplot(1,nb_img, num)
-        #plt.imshow(np.asarray(image))
+        name = ''.join(allRows[img])
+        image = Image.open(images_path + name)
+        plt.subplot(1,nb_img, num)
+        plt.imshow(np.asarray(image))
         num += 1
     larger_clusters.append(plot_leaf)
 plt.show()
@@ -331,12 +331,13 @@ for child in sub_child_int:
         num_7 += 1
 
     for img in plot_leaf:
-        image = Image.open(images_path + str(img).zfill(4) + '.png')
-        #plt.subplot(1,nb_img, num)
-        #plt.imshow(np.asarray(image))
+        name = ''.join(allRows[img])
+        image = Image.open(images_path + name)
+        plt.subplot(1,nb_img, num)
+        plt.imshow(np.asarray(image))
         num += 1
     larger_clusters_2.append(plot_leaf)
-#plt.show()
+plt.show()
 
 num_3, num_4, num_5, num_6, num_7
 
